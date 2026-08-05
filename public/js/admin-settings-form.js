@@ -62,6 +62,8 @@
       homeSiteNameInput: document.getElementById('homeSiteName'),
       homeSiteDescriptionInput: document.getElementById('homeSiteDescription'),
       homeFooterTextInput: document.getElementById('homeFooterText'),
+      faviconUrlInput: document.getElementById('faviconUrl'),
+      githubUrlInput: document.getElementById('githubUrl'),
       homeDefaultCategorySelect: document.getElementById('homeDefaultCategory'),
       homeRememberLastCategorySwitch: document.getElementById('homeRememberLastCategorySwitch'),
       searchEngineSwitch: document.getElementById('searchEngineSwitch'),
@@ -231,6 +233,8 @@
     currentSettings.home_site_name = refs.homeSiteNameInput?.value.trim() || '';
     currentSettings.home_site_description = refs.homeSiteDescriptionInput?.value.trim() || '';
     currentSettings.home_footer_text = refs.homeFooterTextInput?.value.trim() || '';
+    currentSettings.favicon_url = refs.faviconUrlInput?.value.trim() || '';
+    currentSettings.github_url = refs.githubUrlInput?.value.trim() || '';
     currentSettings.home_default_category = refs.homeDefaultCategorySelect?.value || '';
     currentSettings.home_remember_last_category = !!refs.homeRememberLastCategorySwitch?.checked;
     currentSettings.home_search_engine_enabled = !!refs.searchEngineSwitch?.checked;
@@ -380,6 +384,8 @@
     setValue(refs.homeSiteNameInput, currentSettings.home_site_name || '');
     setValue(refs.homeSiteDescriptionInput, currentSettings.home_site_description || '');
     setValue(refs.homeFooterTextInput, currentSettings.home_footer_text || '');
+    setValue(refs.faviconUrlInput, currentSettings.favicon_url || '');
+    setValue(refs.githubUrlInput, currentSettings.github_url || '');
     setValue(refs.homeDefaultCategorySelect, currentSettings.home_default_category || '');
     setChecked(refs.homeRememberLastCategorySwitch, currentSettings.home_remember_last_category);
     setChecked(refs.searchEngineSwitch, currentSettings.home_search_engine_enabled);
