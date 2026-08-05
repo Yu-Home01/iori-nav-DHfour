@@ -269,6 +269,7 @@ export async function onRequest(context) {
   const siteName = S.home_site_name || env.SITE_NAME || '灰色轨迹';
   const siteDescription = S.home_site_description || env.SITE_DESCRIPTION || '一个优雅、快速、易于部署的书签（网址）收藏与分享平台，完全基于 Cloudflare 全家桶构建';
   const footerText = S.home_footer_text || env.FOOTER_TEXT || '曾梦想仗剑走天涯';
+  const githubUrl = S.github_url || '';
   const titleStyle = getStyleStr(S.home_title_size, S.home_title_color, S.home_title_font);
   const subtitleStyle = getStyleStr(S.home_subtitle_size, S.home_subtitle_color, S.home_subtitle_font);
   const statsStyle = getStyleStr(S.home_stats_size, S.home_stats_color, S.home_stats_font);
@@ -402,6 +403,14 @@ export async function onRequest(context) {
 
   // --- 收集所有 </head> 注入内容（合并为一次替换） ---
   let headInjections = '';
+
+  // 自定义 Favicon
+if (S.favicon_url) {
+    const safeFaviconUrl = sanitizeUrl(S.favicon_url);
+    if (safeFaviconUrl) {
+        headInjections += `<link rel="icon" type="image/x-icon" href="${escapeHTML(safeFaviconUrl)}">`;
+    }
+}
 
   // 注入隐藏图标的 CSS
   if (S.home_hide_admin) {
@@ -565,6 +574,7 @@ export async function onRequest(context) {
     'CANONICAL_URL': escapeHTML(canonicalUrl),
     'OG_IMAGE_URL': escapeHTML(ogImageUrl),
     'FOOTER_TEXT': escapeHTML(footerText),
+    'GITHUB_URL': escapeHTML(githubUrl),
     'CATALOG_EXISTS': catalogExists ? 'true' : 'false',
     'CATALOG_LINKS': catalogLinkMarkup,
     'SUBMISSION_CLASS': submissionClass,
