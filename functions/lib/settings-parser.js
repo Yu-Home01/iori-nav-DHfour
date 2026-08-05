@@ -70,6 +70,10 @@ export const SETTINGS_SCHEMA = {
     card_desc_font: { default: '', type: 'string' },
     card_desc_size: { default: '14', type: 'string' },
     card_desc_color: { default: '', type: 'string' },
+    favicon_url: { default: '', type: 'string' },
+    github_url: { default: '', type: 'string' },
+    weather_enabled: { default: false, type: 'bool' },
+    weather_city: { default: '', type: 'string' },
 };
 
 const STYLE_SIZE_KEYS = new Set([
@@ -79,12 +83,12 @@ const STYLE_SIZE_KEYS = new Set([
     'home_hitokoto_size',
     'card_title_size',
     'card_desc_size',
-    'mobile_card_title_size',
+    'mobile_card_title_size'，
     'mobile_card_desc_size',
 ]);
 
 const STYLE_COLOR_KEYS = new Set([
-    'home_title_color',
+    'home_title_color'，
     'home_subtitle_color',
     'home_stats_color',
     'home_hitokoto_color',
@@ -108,6 +112,8 @@ const FONT_KEYS = new Set([
 const URL_KEYS = new Set([
     'home_custom_font_url',
     'layout_custom_wallpaper',
+    'favicon_url',
+    'github_url'，
 ]);
 
 function normalizeParsedCategoryPosition(position, menuLayout) {
