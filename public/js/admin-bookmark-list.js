@@ -235,6 +235,7 @@
     document.getElementById('editBookmarkDesc').value = config.desc;
     document.getElementById('editBookmarkSortOrder').value = config.sort_order;
     document.getElementById('editBookmarkIsPrivate').checked = !!config.is_private;
+    document.getElementById('editBookmarkIsPinned').checked = !!config.is_pinned;
     window.createCascadingDropdown('editBookmarkCatelogWrapper', 'editBookmarkCatelog', window.categoriesTree, config.catelog_id);
 
     const editModal = document.getElementById('editBookmarkModal');
