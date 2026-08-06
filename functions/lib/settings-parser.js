@@ -83,7 +83,7 @@ const STYLE_SIZE_KEYS = new Set([
     'home_hitokoto_size',
     'card_title_size',
     'card_desc_size',
-    'mobile_card_title_size'，
+    'mobile_card_title_size',
     'mobile_card_desc_size',
 ]);
 
