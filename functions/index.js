@@ -171,6 +171,19 @@ export async function onRequest(context) {
   };
   sortCats(rootCategories);
 
+  // 添加「置顶/常用」虚拟分类
+  const pinnedCategory = {
+    id: '__pinned__',
+    catelog: '置顶/常用',
+    sort_order: -999,
+    children: [],
+    is_private: 0
+  };
+  categoryMap.set('__pinned__', pinnedCategory);
+  categoryIdMap.set('置顶/常用', '__pinned__');
+  // 将置顶分类插入到 rootCategories 的最前面
+  rootCategories.unshift(pinnedCategory);
+
   // === 4. 解析设置 ===
   const S = parseSettings(settingsResult.results || settingsResult);
 
@@ -181,6 +194,7 @@ export async function onRequest(context) {
   function resolveCatalogId(catalogValue, options = {}) {
     const value = String(catalogValue || '').trim();
     if (!value || value.toLowerCase() === 'all') return null;
+    if (value.toLowerCase() === 'pinned') return '__pinned__';
     if (/^\d+$/.test(value)) {
       const id = Number(value);
       if (categoryMap.has(id)) return id;
@@ -195,8 +209,8 @@ export async function onRequest(context) {
   // 共享首页缓存仅基于稳定的默认分类渲染，避免用户的 iori_last_category
   // 影响公共 KV HTML。记住上次分类的恢复逻辑仅在前端执行。
   if (!requestedCatalogValue) {
-    const defaultCat = (S.home_default_category || '').trim();
-    requestedCatalogId = resolveCatalogId(defaultCat, { allowName: true });
+    // 默认显示「置顶/常用」分类
+    requestedCatalogId = '__pinned__';
   }
 
   let targetCategoryIds = [];
@@ -204,14 +218,20 @@ export async function onRequest(context) {
   const catalogExists = requestedCatalogId !== null;
 
   if (catalogExists) {
-    const requestedCategory = categoryMap.get(requestedCatalogId);
-    currentCatalogName = requestedCategory.catelog;
-    targetCategoryIds.push(requestedCatalogId);
+    if (requestedCatalogId === '__pinned__') {
+      currentCatalogName = '置顶/常用';
+    } else {
+      const requestedCategory = categoryMap.get(requestedCatalogId);
+      currentCatalogName = requestedCategory.catelog;
+      targetCategoryIds.push(requestedCatalogId);
+    }
   }
 
-  const sites = targetCategoryIds.length > 0
-    ? allSites.filter(site => targetCategoryIds.includes(site.catelog_id))
-    : allSites;
+  const sites = requestedCatalogId === '__pinned__'
+    ? allSites.filter(site => site.is_pinned === 1)
+    : (targetCategoryIds.length > 0
+      ? allSites.filter(site => targetCategoryIds.includes(site.catelog_id))
+      : allSites);
 
   // === 7. 壁纸处理 ===
   // 自定义壁纸优先；留空时使用当前桌面卡片风格的默认壁纸
@@ -224,6 +244,14 @@ export async function onRequest(context) {
   const { headerClass, containerClass, titleColorClass, subTextColorClass, searchInputClass, searchIconClass } = themeClasses;
 
   // === 9. 生成菜单 HTML ===
+  const pinnedLinkActive = requestedCatalogId === '__pinned__';
+  const pinnedLinkClass = pinnedLinkActive ? 'active' : 'inactive';
+  const pinnedLinkActiveMarker = pinnedLinkActive ? 'nav-item-active' : '';
+  const pinnedLinkHtml = `
+    <div class="menu-item-wrapper relative inline-block text-left">
+      <a href="?catalog=pinned" class="nav-btn ${pinnedLinkClass} ${pinnedLinkActiveMarker}">置顶/常用</a>
+    </div>`;
+
   const allLinkActive = !catalogExists;
   const allLinkClass = allLinkActive ? 'active' : 'inactive';
   const allLinkActiveMarker = allLinkActive ? 'nav-item-active' : '';
@@ -231,8 +259,19 @@ export async function onRequest(context) {
     <div class="menu-item-wrapper relative inline-block text-left">
       <a href="?catalog=all" class="nav-btn ${allLinkClass} ${allLinkActiveMarker}">全部</a>
     </div>`;
-  const horizontalCatalogMarkup = horizontalAllLink + renderHorizontalMenu(rootCategories, currentCatalogName);
-  const catalogLinkMarkup = renderVerticalMenu(rootCategories, currentCatalogName, isCustomWallpaper);
+  const horizontalCatalogMarkup = pinnedLinkHtml + horizontalAllLink + renderHorizontalMenu(rootCategories, currentCatalogName);
+  const pinnedVerticalActiveClass = pinnedLinkActive
+    ? "bg-secondary-100 text-primary-700 dark:bg-gray-800 dark:text-primary-400"
+    : "hover:bg-gray-100 text-gray-700 dark:text-gray-300 dark:hover:bg-gray-800";
+  const pinnedVerticalIconClass = pinnedLinkActive
+    ? "text-primary-600 dark:text-primary-400"
+    : (isCustomWallpaper ? "text-gray-600" : "text-gray-400 dark:text-gray-500");
+  const pinnedVerticalLink = `
+    <a href="?catalog=pinned" class="flex items-center px-3 py-2 rounded-lg w-full transition-colors duration-200 ${pinnedVerticalActiveClass}">
+      <svg class="w-5 h-5 mr-3 ${pinnedVerticalIconClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+      置顶/常用
+    </a>`;
+  const catalogLinkMarkup = pinnedVerticalLink + renderVerticalMenu(rootCategories, currentCatalogName, isCustomWallpaper);
 
   // === 10. 生成站点卡片 HTML ===
   let sitesGridMarkup = sites.length > 0
