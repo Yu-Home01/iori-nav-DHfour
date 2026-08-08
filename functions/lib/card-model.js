@@ -92,6 +92,7 @@ export function buildCardViewModel(site) {
   return {
     id: site?.id,
     catelog_id: site?.catelog_id,
+    is_pinned: site?.is_pinned,
     nameHtml: escapeHTML(rawName),
     catalogHtml: escapeHTML(rawCatalog),
     descHtml: escapeHTML(rawDesc),
