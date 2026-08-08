@@ -239,6 +239,11 @@ export async function onRequest(context) {
   const { headerClass, containerClass, titleColorClass, subTextColorClass, searchInputClass, searchIconClass } = themeClasses;
 
   // === 9. 生成菜单 HTML ===
+  const pinnedLinkActive = requestedCatalogId === '__pinned__';
+  const pinnedLinkClass = pinnedLinkActive ? 'active' : 'inactive';
+  const pinnedLinkActiveMarker = pinnedLinkActive ? 'nav-item-active' : '';
+  const pinnedLinkHtml = `<div class="menu-item-wrapper relative inline-block text-left"><a href="?catalog=pinned" class="nav-btn ${pinnedLinkClass} ${pinnedLinkActiveMarker}">置顶/常用</a></div>`;
+
   const allLinkActive = !catalogExists;
   const allLinkClass = allLinkActive ? 'active' : 'inactive';
   const allLinkActiveMarker = allLinkActive ? 'nav-item-active' : '';
@@ -246,8 +251,19 @@ export async function onRequest(context) {
     <div class="menu-item-wrapper relative inline-block text-left">
       <a href="?catalog=all" class="nav-btn ${allLinkClass} ${allLinkActiveMarker}">全部</a>
     </div>`;
-  const horizontalCatalogMarkup = horizontalAllLink + renderHorizontalMenu(rootCategories, currentCatalogName);
-  const catalogLinkMarkup = renderVerticalMenu(rootCategories, currentCatalogName, isCustomWallpaper);
+  const horizontalCatalogMarkup = pinnedLinkHtml + horizontalAllLink + renderHorizontalMenu(rootCategories, currentCatalogName);
+  const pinnedVerticalActiveClass = pinnedLinkActive
+    ? "bg-secondary-100 text-primary-700 dark:bg-gray-800 dark:text-primary-400"
+    : "hover:bg-gray-100 text-gray-700 dark:text-gray-300 dark:hover:bg-gray-800";
+  const pinnedVerticalIconClass = pinnedLinkActive
+    ? "text-primary-600 dark:text-primary-400"
+    : (isCustomWallpaper ? "text-gray-600" : "text-gray-400 dark:text-gray-500");
+  const pinnedVerticalLink = `
+    <a href="?catalog=pinned" class="flex items-center px-3 py-2 rounded-lg w-full transition-colors duration-200 ${pinnedVerticalActiveClass}">
+      <svg class="w-5 h-5 mr-3 ${pinnedVerticalIconClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+      置顶/常用
+    </a>`;
+  const catalogLinkMarkup = pinnedVerticalLink + renderVerticalMenu(rootCategories, currentCatalogName, isCustomWallpaper);
 
   // === 10. 生成站点卡片 HTML ===
   let sitesGridMarkup = sites.length > 0
