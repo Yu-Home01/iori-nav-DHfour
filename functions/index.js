@@ -241,7 +241,7 @@ export async function onRequest(context) {
   const pinnedLinkActive = requestedCatalogId === '__pinned__';
   const pinnedLinkClass = pinnedLinkActive ? 'active' : 'inactive';
   const pinnedLinkActiveMarker = pinnedLinkActive ? 'nav-item-active' : '';
-  const pinnedLinkHtml = `<div class="menu-item-wrapper relative inline-block text-left"><a href="?catalog=pinned" class="nav-btn ${pinnedLinkClass} ${pinnedLinkActiveMarker}">置顶/常用</a></div>`;
+  const pinnedLinkHtml = `<div class="menu-item-wrapper relative inline-block text-left"><a href="?catalog=pinned" data-id="pinned" class="nav-btn ${pinnedLinkClass} ${pinnedLinkActiveMarker}">置顶/常用</a></div>`;
 
   const allLinkActive = !catalogExists;
   const allLinkClass = allLinkActive ? 'active' : 'inactive';
@@ -258,7 +258,7 @@ export async function onRequest(context) {
     ? "text-primary-600 dark:text-primary-400"
     : (isCustomWallpaper ? "text-gray-600" : "text-gray-400 dark:text-gray-500");
   const pinnedVerticalLink = `
-    <a href="?catalog=pinned" class="flex items-center px-3 py-2 rounded-lg w-full transition-colors duration-200 ${pinnedVerticalActiveClass}">
+    <a href="?catalog=pinned" data-id="pinned" class="flex items-center px-3 py-2 rounded-lg w-full transition-colors duration-200 ${pinnedVerticalActiveClass}">
       <svg class="w-5 h-5 mr-3 ${pinnedVerticalIconClass}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
       置顶/常用
     </a>`;
