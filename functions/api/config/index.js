@@ -27,7 +27,9 @@ export async function onRequestGet(context) {
     let queryBase = `FROM sites s WHERE (s.is_private = 0 OR ? = 1)`;
     let queryBindParams = [includePrivate];
 
-    if (catalogId) {
+    if (catalogId === 'pinned') {
+      queryBase += ` AND s.is_pinned = 1`;
+    } else if (catalogId) {
       queryBase += ` AND s.catelog_id = ?`;
       queryBindParams.push(catalogId);
     } else if (catalog) {
