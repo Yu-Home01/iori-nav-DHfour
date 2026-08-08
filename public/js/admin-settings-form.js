@@ -181,7 +181,7 @@
       }
     }
 
-    selectElement.innerHTML = '<option value="">默认 (全部)</option>';
+    selectElement.innerHTML = '<option value="">默认 (全部)</option><option value="pinned">置顶/常用</option>';
     const addOptions = (nodes, prefix = '') => {
       nodes.forEach(node => {
         const option = document.createElement('option');
