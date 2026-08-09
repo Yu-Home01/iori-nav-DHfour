@@ -139,6 +139,10 @@
   }
 
   function getInitialDropdownLabel(input, categoriesTree, initialValue, isFilter) {
+    if (initialValue === 'pinned') {
+      input.value = 'pinned';
+      return '置顶/常用';
+    }
     if (initialValue && initialValue != '0') {
       if (isFilter) {
         input.value = initialValue;
@@ -189,6 +193,20 @@
       input.dispatchEvent(new Event('change'));
     });
     menu.appendChild(rootItem);
+  }
+
+  function appendPinnedItem(menu, input, trigger) {
+    const pinnedItem = document.createElement('div');
+    pinnedItem.className = 'custom-dropdown-item';
+    pinnedItem.innerHTML = '<span class="font-medium text-gray-900">置顶/常用</span>';
+    pinnedItem.addEventListener('click', (e) => {
+      e.stopPropagation();
+      input.value = 'pinned';
+      trigger.textContent = '置顶/常用';
+      menu.classList.remove('show');
+      input.dispatchEvent(new Event('change'));
+    });
+    menu.appendChild(pinnedItem);
   }
 
   function appendCategoryItems(menu, input, trigger, nodes, excludeId, isFilter, depth = 0) {
@@ -243,6 +261,7 @@
 
     if (isFilter) {
       appendFilterAllItem(menu, input, trigger);
+      appendPinnedItem(menu, input, trigger);
     }
 
     appendCategoryItems(menu, input, trigger, categoriesTree, excludeId, isFilter);
