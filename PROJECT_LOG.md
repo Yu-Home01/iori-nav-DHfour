@@ -41,7 +41,7 @@
 | `admin-bookmark-list.js` | v=2 | ... |
 
 ## 💡 给 Kimi 的续上下文模板
-> 我是 Yu-Home01，56岁，Fork 了 iori-nav 项目，在 test 分支开发。
+> 我是 Yu-Home01，Fork 了 iori-nav 项目，在 test 分支开发。
 > 当前已完成：Favicon、GitHub链接、置顶/常用分类及排序。
 > 现在要做：【填你想做的功能】。
 > 技术栈：Cloudflare Pages + Workers + D1 + KV。
