@@ -379,5 +379,19 @@
 
     Home.updateNavigationState = updateNavigationState;
     restoreLastCategory();
+    
+    Home.closeSidebarMenu = function() {
+      const toggle = document.getElementById('sidebar-toggle');
+      if (toggle) toggle.checked = false;
+  
+      const mobileSidebar = document.getElementById('mobileSidebar');
+      const mobileOverlay = document.getElementById('mobileOverlay');
+      if (mobileSidebar) {
+        mobileSidebar.classList.remove('open');
+      }
+      if (mobileOverlay) {
+        mobileOverlay.classList.remove('open');
+      }
+    };
   };
 })();
