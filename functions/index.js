@@ -300,6 +300,13 @@ export async function onRequest(context) {
   const siteDescription = S.home_site_description || env.SITE_DESCRIPTION || '一个优雅、快速、易于部署的书签（网址）收藏与分享平台，完全基于 Cloudflare 全家桶构建';
   const footerText = S.home_footer_text || env.FOOTER_TEXT || '曾梦想仗剑走天涯';
   const githubUrl = S.github_url || '';
+  const navAvatarUrl = S.nav_avatar_url || '';
+  const navAvatarSize = S.nav_avatar_size || '40';
+  const navAvatarHtml = navAvatarUrl ? `
+    <div class="flex justify-center mb-2">
+      <img src="${escapeHTML(navAvatarUrl)}" alt="avatar" class="nav-avatar" style="width: ${escapeHTML(navAvatarSize)}px; height: ${escapeHTML(navAvatarSize)}px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(128,128,128,0.2); box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+    </div>
+  ` : '';
   const titleStyle = getStyleStr(S.home_title_size, S.home_title_color, S.home_title_font);
   const subtitleStyle = getStyleStr(S.home_subtitle_size, S.home_subtitle_color, S.home_subtitle_font);
   const statsStyle = getStyleStr(S.home_stats_size, S.home_stats_color, S.home_stats_font);
@@ -358,7 +365,7 @@ export async function onRequest(context) {
 
   const verticalHeaderContent = `
     <div class="max-w-4xl mx-auto text-center relative z-10 ${themeClass} py-8">
-      <div class="home-title-block mb-8">${horizontalTitleHtml}${horizontalSubtitleHtml}</div>
+      <div class="home-title-block mb-8">${navAvatarHtml}${horizontalTitleHtml}${horizontalSubtitleHtml}</div>
       <div class="home-search-shell relative max-w-xl mx-auto">
         ${searchEngineOptions}
         <div class="home-search-field relative">
@@ -371,7 +378,7 @@ export async function onRequest(context) {
   const horizontalHeaderContent = `
     <div class="max-w-5xl mx-auto text-center relative z-10 ${themeClass}">
       ${categoryPosition === 'top' ? `<div class="category-nav-top-wrap">${horizontalCategoryNavHtml}</div>` : ''}
-      <div class="home-title-block max-w-4xl mx-auto mb-8">${horizontalTitleHtml}${horizontalSubtitleHtml}</div>
+      <div class="home-title-block max-w-4xl mx-auto mb-8">${navAvatarHtml}${horizontalTitleHtml}${horizontalSubtitleHtml}</div>
       ${categoryPosition === 'above_search' ? `<div class="mb-8">${horizontalCategoryNavHtml}</div>` : ''}
       <div class="home-search-shell relative max-w-xl mx-auto ${categoryPosition === 'below_search' ? 'mb-8' : ''}">
         ${searchEngineOptions}
