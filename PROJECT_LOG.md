@@ -23,15 +23,16 @@
 | GitHub 链接自定义 | `functions/index.js` | 2026-08-08 |
 | 置顶/常用分类 | `schema.sql`, `functions/index.js`, `public/js/admin-shared.js` 等 | 2026-08-08 |
 | 置顶书签后台排序 | `functions/api/config/index.js`, `public/js/admin-shared.js` | 2026-08-08 |
+| 桌面端侧边栏抽屉式设计 | `functions/index.js`，`public/index.html`，`public/css/style.css`，`public/js/home-category-nav.js`| 2026-08-12 |
 
 ## ❌ 已知问题 / 待修复
 - [ ] 问题1：描述问题...
 - [ ] 问题2：描述问题...
 
 ## 📋 待添加功能
-- [侧边栏抽屉式设计] 功能1：目前进入首页，侧边栏默认处于展开状态。想实现：默认处于关闭状态，当鼠标悬停（或点击）侧边栏按钮时就打开，鼠标移开（或点击某一分类完成）则自动收起。
 - [自定义导航栏头像] 功能2：可以本地上传图片作为导航栏头像。
 - [添加天气组件] 功能3：为导航页添加天气组件， 可以显示两个地方的天气，可以自定义组件摆放位置。
+- [添加必应搜索] 功能3：将必应（Bing）搜索添加到“站外”搜索选项中。
 
 ## 🗂️ 关键文件清单
 | 文件路径 | 作用 |
@@ -49,9 +50,11 @@
 |------|---------|---------|
 | `admin-shared.js` | v=3 | 2026-08-08 |
 | `admin-bookmark-list.js` | v=2 | ... |
+| `style.css` | v=f437bf08 | 2026-08-12 |
+| `home-category-nav.js` | v=f3808ac4 | 2026-08-12 |
 
 ## 💡 给 Kimi 的续上下文模板
 > 我是 Yu-Home01，Fork 了 iori-nav 项目，在 test 分支开发。
-> 当前已完成：Favicon、GitHub链接、置顶/常用分类及排序。
-> 现在要做：【侧边栏抽屉式设计】。
+> 当前已完成：Favicon、GitHub链接、置顶/常用分类及排序、桌面端侧边栏抽屉式设计。
+> 现在要做：【自定义导航栏头像】。
 > 技术栈：Cloudflare Pages + Workers + D1 + KV。
