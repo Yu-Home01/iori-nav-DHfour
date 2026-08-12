@@ -1697,8 +1697,27 @@ body .search-engine-option.active {
 
 #sidebar-toggle { display: none; }
 @media (min-width: 1024px) {
-  #sidebar-toggle:checked ~ .sidebar { margin-left: -16rem; }
-  #sidebar-toggle:checked ~ .main-content { margin-left: 0; }
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  #sidebar-toggle:checked ~ .sidebar {
+    transform: translateX(0);
+  }
+  .main-content {
+    margin-left: 0 !important;
+  }
+  #sidebar-toggle:checked ~ .main-content {
+    margin-left: 16rem !important;
+  }
+  .mobile-overlay {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  #sidebar-toggle:checked ~ .mobile-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
 
 /* 毛玻璃效果 - Light Mode */
