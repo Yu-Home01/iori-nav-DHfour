@@ -385,7 +385,7 @@ export async function onRequest(context) {
 
   // === 15. 布局控制 ===
   let sidebarClass = '';
-  let mainClass = 'lg:ml-64';
+  let mainClass = '';
   let sidebarToggleClass = '';
   let mobileToggleVisibilityClass = 'lg:hidden';
   let adminIconHtml = '';
