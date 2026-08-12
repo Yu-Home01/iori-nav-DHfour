@@ -17,7 +17,7 @@
   <meta name="twitter:description" content="{{SITE_DESCRIPTION}}">
   <meta name="twitter:image" content="{{OG_IMAGE_URL}}">
   <link rel="icon" href="/favicon.svg?v=148aafdf" type="image/svg+xml">
-  <link rel="stylesheet" href="/css/style.css?v=f437bf07">
+  <link rel="stylesheet" href="/css/style.css?v=f437bf08">
   <script>
     // Init Theme ASAP to prevent FOUC
     if (localStorage.getItem('theme') === 'dark') {
@@ -50,7 +50,7 @@
   <!-- 右上角操作区 (主题切换, 后台入口) -->
   {{RIGHT_TOP_ACTION}}
   
-  <div id="mobileOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 mobile-overlay lg:hidden"></div>
+  <div id="mobileOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 mobile-overlay"></div>
   
   <!-- 桌面侧边栏开关按钮 -->
   <div class="fixed top-4 left-4 z-50 hidden lg:block {{SIDEBAR_TOGGLE_CLASS}}">
@@ -62,7 +62,7 @@
   </div>
   
   <!-- 侧边栏 -->
-  <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-900 shadow-md border-r border-primary-100/60 dark:border-gray-800 z-50 overflow-y-auto mobile-sidebar lg:transform-none transition-all duration-300 {{SIDEBAR_CLASS}}">
+  <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-64 bg-white dark:bg-gray-900 shadow-md border-r border-primary-100/60 dark:border-gray-800 z-50 overflow-y-auto mobile-sidebar transition-all duration-300 {{SIDEBAR_CLASS}}">
     <div class="p-6">
       <div class="flex items-center justify-end mb-8">
         <button id="closeSidebar" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden">
@@ -223,7 +223,7 @@
   <script src="/js/home-cards.js?v=2"></script>
   <script src="/js/home-submit.js?v=5457a66d"></script>
   <script src="/js/home-search.js?v=fd3df0ae"></script>
-  <script src="/js/home-category-nav.js?v=f3808ac3"></script>
+  <script src="/js/home-category-nav.js?v=f3808ac4"></script>
   <script src="/js/main.js?v=193ce81f"></script>
 </body>
 </html>
