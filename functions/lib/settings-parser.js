@@ -72,6 +72,8 @@ export const SETTINGS_SCHEMA = {
     card_desc_color: { default: '', type: 'string' },
     favicon_url: { default: '', type: 'string' },
     github_url: { default: '', type: 'string' },
+    nav_avatar_url: { default: '', type: 'string' },
+    nav_avatar_size: { default: '40', type: 'string' },
     weather_enabled: { default: false, type: 'bool' },
     weather_city: { default: '', type: 'string' },
 };
@@ -271,6 +273,22 @@ export function normalizeSettingValueForStorage(key, value) {
         return normalized === null ? { ok: false, message: `Invalid ${key}` } : { ok: true, value: normalized };
     }
 
+    if (key === 'nav_avatar_url') {
+      if (isEmptyOptionalValue(text)) return { ok: true, value: '' };
+      if (!/^https?:\/\//i.test(text) && !/^data:image\/[\w+.-]+;base64,/i.test(text)) {
+        return { ok: false, message: '头像必须是有效的图片 URL 或本地上传的图片' };
+      }
+      if (text.length > 100000) {
+        return { ok: false, message: '头像图片过大，请压缩后重新上传（建议小于 70KB）' };
+      }
+      return { ok: true, value: text };
+    }
+
+    if (key === 'nav_avatar_size') {
+      const normalized = normalizeIntegerRange(text, 20, 120, '40');
+      return normalized === null ? { ok: false, message: '头像尺寸必须在 20-120 像素之间' } : { ok: true, value: normalized };
+    }
+    
     if (key === 'wallpaper_cid_360' && text && !/^\d{1,8}$/.test(text)) {
         return { ok: false, message: 'Invalid wallpaper_cid_360' };
     }
