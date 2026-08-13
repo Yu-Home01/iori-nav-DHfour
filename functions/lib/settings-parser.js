@@ -203,6 +203,17 @@ export function normalizeSettingValueForStorage(key, value) {
       }
       return { ok: true, value: safeUrl };
     }
+
+    // favicon_url 支持外部 URL 和本地上传的 Base64 图片
+    if (key === 'favicon_url') {
+      if (isEmptyOptionalValue(text)) return { ok: true, value: '' };
+      if (/^data:image\/[\w+.-]+;base64,/i.test(text)) {
+        if (text.length > 100000) {
+          return { ok: false, message: 'Favicon 图片过大，请压缩后重新上传' };
+        }
+        return { ok: true, value: text };
+      }
+    }
     
     if (URL_KEYS.has(key)) {
         if (isEmptyOptionalValue(text)) return { ok: true, value: '' };
