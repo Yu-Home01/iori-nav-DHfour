@@ -198,6 +198,10 @@ export function normalizeSettingValueForStorage(key, value) {
         }
         return { ok: true, value: text };
       }
+      // 允许内部 API 路径（KV 存储后的固定链接）
+      if (text === '/api/favicon') {
+        return { ok: true, value: text };
+      }  
       // 普通 URL
       const safeUrl = sanitizeUrl(text);
       if (!safeUrl) {
