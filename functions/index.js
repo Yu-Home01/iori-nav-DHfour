@@ -435,15 +435,15 @@ export async function onRequest(context) {
   let headInjections = '';
 
   // 自定义 Favicon
-if (S.favicon_url) {
-  let safeFaviconUrl = S.favicon_url;
-  if (!/^data:image\/[\w+.-]+;base64,/i.test(safeFaviconUrl)) {
-    safeFaviconUrl = sanitizeUrl(safeFaviconUrl);
+  if (S.favicon_url) {
+    let safeFaviconUrl = S.favicon_url;
+    if (!/^data:image\/[\w+.-]+;base64,/i.test(safeFaviconUrl)) {
+      safeFaviconUrl = sanitizeUrl(safeFaviconUrl);
+    }
+    if (safeFaviconUrl) {
+      headInjections += `<link rel="icon" href="${escapeHTML(safeFaviconUrl)}" type="image/x-icon">`;
+    }
   }
-  if (safeFaviconUrl) {
-    headInjections += `<link rel="icon" href="${escapeHTML(safeFaviconUrl)}" type="image/x-icon">`;
-  }
-}
   
   // 注入隐藏图标的 CSS
   if (S.home_hide_admin) {
