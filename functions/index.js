@@ -441,7 +441,7 @@ export async function onRequest(context) {
       safeFaviconUrl = sanitizeUrl(safeFaviconUrl);
     }
     if (safeFaviconUrl) {
-      let iconType = 'image/x-icon';
+      let iconType = 'image/png';
       if (safeFaviconUrl.startsWith('data:image/png')) iconType = 'image/png';
       else if (safeFaviconUrl.startsWith('data:image/jpeg')) iconType = 'image/jpeg';
       else if (safeFaviconUrl.startsWith('data:image/webp')) iconType = 'image/webp';
