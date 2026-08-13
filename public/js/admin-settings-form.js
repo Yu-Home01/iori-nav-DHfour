@@ -63,13 +63,9 @@
       homeSiteDescriptionInput: document.getElementById('homeSiteDescription'),
       homeFooterTextInput: document.getElementById('homeFooterText'),
       faviconUrlInput: document.getElementById('faviconUrl'),
+      faviconUploadInput: document.getElementById('faviconUploadInput'),
+      faviconUploadBtn: document.getElementById('faviconUploadBtn'),
       githubUrlInput: document.getElementById('githubUrl'),
-      navAvatarUrlInput: document.getElementById('navAvatarUrl'),
-      navAvatarSizeInput: document.getElementById('navAvatarSize'),
-      navAvatarInput: document.getElementById('navAvatarInput'),
-      navAvatarUploadBtn: document.getElementById('navAvatarUploadBtn'),
-      navAvatarPreview: document.getElementById('navAvatarPreview'),
-      navAvatarClearBtn: document.getElementById('navAvatarClearBtn'),
       homeDefaultCategorySelect: document.getElementById('homeDefaultCategory'),
       homeRememberLastCategorySwitch: document.getElementById('homeRememberLastCategorySwitch'),
       searchEngineSwitch: document.getElementById('searchEngineSwitch'),
@@ -241,8 +237,6 @@
     currentSettings.home_footer_text = refs.homeFooterTextInput?.value.trim() || '';
     currentSettings.favicon_url = refs.faviconUrlInput?.value.trim() || '';
     currentSettings.github_url = refs.githubUrlInput?.value.trim() || '';
-    currentSettings.nav_avatar_url = refs.navAvatarUrlInput?.value.trim() || '';
-    currentSettings.nav_avatar_size = refs.navAvatarSizeInput?.value.trim() || '40';
     currentSettings.home_default_category = refs.homeDefaultCategorySelect?.value || '';
     currentSettings.home_remember_last_category = !!refs.homeRememberLastCategorySwitch?.checked;
     currentSettings.home_search_engine_enabled = !!refs.searchEngineSwitch?.checked;
@@ -394,19 +388,6 @@
     setValue(refs.homeFooterTextInput, currentSettings.home_footer_text || '');
     setValue(refs.faviconUrlInput, currentSettings.favicon_url || '');
     setValue(refs.githubUrlInput, currentSettings.github_url || '');
-    setValue(refs.navAvatarUrlInput, currentSettings.nav_avatar_url || '');
-    setValue(refs.navAvatarSizeInput, currentSettings.nav_avatar_size || '40');
-
-    if (refs.navAvatarPreview && refs.navAvatarClearBtn) {
-      if (currentSettings.nav_avatar_url) {
-        refs.navAvatarPreview.src = currentSettings.nav_avatar_url;
-        refs.navAvatarPreview.style.display = 'inline-block';
-        refs.navAvatarClearBtn.style.display = 'inline-block';
-      } else {
-        refs.navAvatarPreview.style.display = 'none';
-        refs.navAvatarClearBtn.style.display = 'none';
-      }
-    }
     setValue(refs.homeDefaultCategorySelect, currentSettings.home_default_category || '');
     setChecked(refs.homeRememberLastCategorySwitch, currentSettings.home_remember_last_category);
     setChecked(refs.searchEngineSwitch, currentSettings.home_search_engine_enabled);
@@ -475,77 +456,53 @@
     ns.preview?.updatePreviewWidth?.();
   }
 
-    function initAvatarUpload() {
-      const refs = getRefs();
-      if (!refs.navAvatarUploadBtn || !refs.navAvatarInput) return;
+  function initFaviconUpload() {
+    const refs = getRefs();
+    if (!refs.faviconUploadBtn || !refs.faviconUploadInput) return;
 
-      refs.navAvatarUploadBtn.addEventListener('click', () => {
-        refs.navAvatarInput.click();
-      });
+    refs.faviconUploadBtn.addEventListener('click', () => {
+      refs.faviconUploadInput.click();
+    });
 
-      refs.navAvatarInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    refs.faviconUploadInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
 
-        if (file.size > 200 * 1024) {
-          window.showMessage('图片过大，请选择小于 200KB 的图片', 'error');
-          return;
-        }
+      if (file.size > 100 * 1024) {
+        window.showMessage('图标图片过大，请选择小于 100KB 的图片', 'error');
+        return;
+      }
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const img = new Image();
-          img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const size = 120;
-            canvas.width = size;
-            canvas.height = size;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          const size = 64;
+          canvas.width = size;
+          canvas.height = size;
+          ctx.drawImage(img, 0, 0, size, size);
+          const dataUrl = canvas.toDataURL('image/png');
 
-            let sx, sy, sWidth, sHeight;
-            if (img.width > img.height) {
-              sHeight = img.height;
-              sWidth = img.height;
-              sx = (img.width - img.height) / 2;
-              sy = 0;
-            } else {
-              sWidth = img.width;
-              sHeight = img.width;
-              sx = 0;
-              sy = (img.height - img.width) / 2;
-            }
+          if (dataUrl.length > 50000) {
+            window.showMessage('压缩后仍过大，请选择更小的图片', 'error');
+            return;
+          }
 
-            ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, size, size);
-            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-
-            if (dataUrl.length > 90000) {
-              window.showMessage('压缩后仍过大，请选择更小的图片', 'error');
-              return;
-            }
-
-            if (refs.navAvatarUrlInput) refs.navAvatarUrlInput.value = dataUrl;
-            if (refs.navAvatarPreview) {
-              refs.navAvatarPreview.src = dataUrl;
-              refs.navAvatarPreview.style.display = 'inline-block';
-            }
-            if (refs.navAvatarClearBtn) refs.navAvatarClearBtn.style.display = 'inline-block';
-            window.showMessage('头像已加载，点击保存后生效', 'success');
-          };
-          img.src = event.target.result;
+          if (refs.faviconUrlInput) {
+            refs.faviconUrlInput.value = dataUrl;
+          }
+          window.showMessage('图标已加载，点击保存后生效', 'success');
         };
-        reader.readAsDataURL(file);
-      });
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
 
-      refs.navAvatarClearBtn.addEventListener('click', () => {
-        if (refs.navAvatarUrlInput) refs.navAvatarUrlInput.value = '';
-        if (refs.navAvatarPreview) refs.navAvatarPreview.style.display = 'none';
-        if (refs.navAvatarClearBtn) refs.navAvatarClearBtn.style.display = 'none';
-        if (refs.navAvatarInput) refs.navAvatarInput.value = '';
-      });
-    }
+  initFaviconUpload();
 
-    initAvatarUpload();
-  
     ns.form = {
       getRefs,
       loadCategoryOptions,
