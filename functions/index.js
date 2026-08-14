@@ -266,7 +266,7 @@ export async function onRequest(context) {
 
   // === 10. 生成站点卡片 HTML ===
   // === 天气卡片（仅在"置顶/常用"分类显示）===
-  const isPinnedCatalog = requestedCatalogValue === 'pinned';
+  const isPinnedCatalog = true; // 临时测试：所有分类都显示天气
   const showWeather = S.weather_enabled && isPinnedCatalog && (S.weather_city_1 || S.weather_city_2);
 
   function generateWeatherCardHtml(settings) {
@@ -324,18 +324,27 @@ export async function onRequest(context) {
   if (showWeather && weatherCardHtml && sitesGridMarkup) {
     const sort = Number(S.weather_card_sort || 0);
   
-    if (sort >= 500) {
-      // 放在最后：在最后一个 </div> 之前插入
-      const lastDiv = sitesGridMarkup.lastIndexOf('</div>');
-      if (lastDiv > 0) {
-        sitesGridMarkup = sitesGridMarkup.slice(0, lastDiv) + weatherCardHtml + sitesGridMarkup.slice(lastDiv);
+    // 检查 sitesGridMarkup 是否是正常的 grid 容器（有书签时）
+    const hasGridContainer = sitesGridMarkup.includes('class="grid') || sitesGridMarkup.includes("class='grid");
+  
+    if (hasGridContainer) {
+      if (sort >= 500) {
+        // 放在最后：找到最后一个 </div> 之前
+        const lastDiv = sitesGridMarkup.lastIndexOf('</div>');
+        if (lastDiv > 0) {
+          sitesGridMarkup = sitesGridMarkup.slice(0, lastDiv) + weatherCardHtml + sitesGridMarkup.slice(lastDiv);
+        }
+      } else {
+        // 放在最前：找到 grid 容器开始标签的结束位置
+        const gridMatch = sitesGridMarkup.match(/<div[^>]*class="[^"]*grid[^"]*"[^>]*>/i);
+        if (gridMatch) {
+          const insertPos = gridMatch.index + gridMatch[0].length;
+          sitesGridMarkup = sitesGridMarkup.slice(0, insertPos) + weatherCardHtml + sitesGridMarkup.slice(insertPos);
+        }
       }
     } else {
-      // 放在最前：在第一个标签的 ">" 之后插入
-      const firstTagEnd = sitesGridMarkup.indexOf('>');
-      if (firstTagEnd > 0) {
-        sitesGridMarkup = sitesGridMarkup.slice(0, firstTagEnd + 1) + weatherCardHtml + sitesGridMarkup.slice(firstTagEnd + 1);
-      }
+      // 空状态或其他情况：直接在最前面添加
+      sitesGridMarkup = weatherCardHtml + sitesGridMarkup;
     }
   }
 
