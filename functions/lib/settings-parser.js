@@ -73,7 +73,10 @@ export const SETTINGS_SCHEMA = {
     favicon_url: { default: '', type: 'string' },
     github_url: { default: '', type: 'string' },
     weather_enabled: { default: false, type: 'bool' },
-    weather_city: { default: '', type: 'string' },
+    weather_city_1: { default: '', type: 'string' },
+    weather_city_2: { default: '', type: 'string' },
+    weather_card_size: { default: '2x', type: 'string' },
+    weather_card_sort: { default: '0', type: 'string' },
 };
 
 const STYLE_SIZE_KEYS = new Set([
@@ -294,6 +297,14 @@ export function normalizeSettingValueForStorage(key, value) {
     
     if (key === 'wallpaper_cid_360' && text && !/^\d{1,8}$/.test(text)) {
         return { ok: false, message: 'Invalid wallpaper_cid_360' };
+    }
+
+    if (key === 'weather_card_size' && !['2x', '4x'].includes(text)) {
+      return { ok: false, message: '天气卡片大小只能是 2x 或 4x' };
+    }
+    if (key === 'weather_card_sort') {
+      const normalized = normalizeIntegerRange(text, 0, 999, '0');
+      return normalized === null ? { ok: false, message: '排序数值必须在 0-999 之间' } : { ok: true, value: normalized };
     }
 
     if (text.length > 2000) {
