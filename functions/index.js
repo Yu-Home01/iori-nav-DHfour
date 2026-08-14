@@ -265,9 +265,98 @@ export async function onRequest(context) {
   const catalogLinkMarkup = pinnedVerticalLink + renderVerticalMenu(rootCategories, currentCatalogName, isCustomWallpaper);
 
   // === 10. 生成站点卡片 HTML ===
+  // === 天气卡片（仅在"置顶/常用"分类显示）===
+  const isPinnedCatalog = requestedCatalogValue === 'pinned';
+  const showWeather = S.weather_enabled && isPinnedCatalog && (S.weather_city_1 || S.weather_city_2);
+
+  function generateWeatherCardHtml(settings) {
+    const cities = [settings.weather_city_1, settings.weather_city_2].filter(Boolean);
+    const sizeClass = settings.weather_card_size === '4x' ? 'col-span-2 md:col-span-4' : 'col-span-2';
+    const citiesJson = JSON.stringify(cities);
+
+    return `
+      <div class="site-card weather-card ${sizeClass}">
+        <div class="weather-card-inner">
+          <div class="weather-loading" id="weatherLoading">🌤️ 天气加载中...</div>
+          <div class="weather-cities" id="weatherCities" style="display:none;"></div>
+        </div>
+        <script>
+          (function(){
+            var cities = ${citiesJson};
+            var container = document.getElementById('weatherCities');
+            var loading = document.getElementById('weatherLoading');
+            if(!container || !loading) return;
+            Promise.all(cities.map(function(city){
+              return fetch('/api/weather?city=' + encodeURIComponent(city))
+                .then(function(r){ return r.json(); })
+                .then(function(d){ return d.code === 200 ? d.data : null; })
+                .catch(function(){ return null; });
+            })).then(function(results){
+              var html = '';
+              results.forEach(function(data){
+                if(data){
+                  html += '<div class="weather-city-item">' +
+                    '<span class="w-city">' + data.city + '</span>' +
+                    '<span class="w-temp">' + data.temp + '°C</span>' +
+                    '<span class="w-desc">' + data.weather + '</span>' +
+                    '<span class="w-wind">' + data.wind + data.windLevel + '</span>' +
+                    '</div>';
+                }
+              });
+              if(html){
+                container.innerHTML = html;
+                container.style.display = 'flex';
+                loading.style.display = 'none';
+              }
+            });
+          })();
+        </script>
+      </div>
+    `;
+  }
+
+  let weatherCardHtml = showWeather ? generateWeatherCardHtml(S) : '';
   let sitesGridMarkup = sites.length > 0
     ? renderSiteCards(sites, S)
     : renderEmptyState(categories.length, S.home_hide_admin);
+
+  // 插入天气卡片到置顶/常用分类
+  if (showWeather && weatherCardHtml) {
+    const sort = Number(S.weather_card_sort || 0);
+  
+    if (sort >= 900) {
+      // 最后面：在 grid 容器的最后一个 </div> 前插入
+      const lastIndex = sitesGridMarkup.lastIndexOf('</div>');
+      if (lastIndex > 0) {
+        sitesGridMarkup = sitesGridMarkup.slice(0, lastIndex) + weatherCardHtml + sitesGridMarkup.slice(lastIndex);
+      }
+    } else if (sort >= 400) {
+      // 中间：在第一个书签卡片后面插入
+      const firstCardMatch = sitesGridMarkup.match(/<div[^>]*class="[^"]*site-card[^"]*"/i);
+      if (firstCardMatch) {
+        let depth = 1;
+        let pos = firstCardMatch.index + firstCardMatch[0].length;
+        while (pos < sitesGridMarkup.length && depth > 0) {
+          const openIdx = sitesGridMarkup.indexOf('<div', pos);
+          const closeIdx = sitesGridMarkup.indexOf('</div>', pos);
+          if (closeIdx === -1) break;
+          if (openIdx !== -1 && openIdx < closeIdx) {
+            depth++;
+            pos = openIdx + 4;
+          } else {
+            depth--;
+            pos = closeIdx + 6;
+          }
+        }
+        sitesGridMarkup = sitesGridMarkup.slice(0, pos) + weatherCardHtml + sitesGridMarkup.slice(pos);
+      } else {
+        sitesGridMarkup = sitesGridMarkup.replace(/(<div\s+class="grid[^"]*"[^>]*>)/i, '$1' + weatherCardHtml);
+      }
+    } else {
+      // 最前面：在 grid 开始标签后插入
+      sitesGridMarkup = sitesGridMarkup.replace(/(<div\s+class="grid[^"]*"[^>]*>)/i, '$1' + weatherCardHtml);
+    }
+  }
 
   // === 11. 计算 Grid 列数 ===
   const getMobileGridClass = (cols) => {
@@ -564,6 +653,26 @@ export async function onRequest(context) {
     if (mobileCardDescStyle) customCardCss += `@media (max-width: 767px) { .site-card p { ${mobileCardDescStyle} } }`;
   }
   if (customCardCss) headInjections += `<style>${customCardCss}</style>`;
+  // 天气卡片样式
+  if (showWeather) {
+    headInjections += `<style>
+      .weather-card { background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(147,197,253,0.08) 100%); border: 1px solid rgba(59,130,246,0.15); min-height: 120px; }
+      .weather-card-inner { padding: 16px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+      .weather-loading { text-align: center; color: #888; font-size: 14px; }
+      .weather-cities { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; align-items: center; }
+      .weather-city-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 16px; background: rgba(255,255,255,0.5); border-radius: 12px; }
+      .w-city { font-weight: 600; font-size: 15px; color: #1f2937; }
+      .w-temp { font-size: 26px; font-weight: 700; color: #e74c3c; }
+      .w-desc { font-size: 13px; color: #666; }
+      .w-wind { font-size: 11px; color: #888; }
+      .custom-wallpaper .weather-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(12px); border-color: rgba(255,255,255,0.15); }
+      .custom-wallpaper .weather-city-item { background: rgba(0,0,0,0.15); }
+      .custom-wallpaper .w-city { color: #fff; }
+      .custom-wallpaper .w-temp { color: #fbbf24; }
+      .custom-wallpaper .w-desc { color: rgba(255,255,255,0.8); }
+      .custom-wallpaper .w-wind { color: rgba(255,255,255,0.6); }
+    </style>`;
+  }
 
   // 全局站点卡片视图模型与布局配置：直接序列化后注入到 main.js 之前
   const cardHydrationState = buildCardHydrationState(allSites, S);
