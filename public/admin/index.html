@@ -592,6 +592,41 @@
                   </div>
                   <p class="text-xs text-gray-400 mt-1">支持输入链接或本地上传图片作为浏览器标签页图标</p>
                 </div>
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                  <label class="text-xs text-gray-500 block mb-2 font-semibold">🌤️ 天气组件（仅在"置顶/常用"分类显示）</label>
+  
+                  <div class="flex items-center gap-2 mb-3">
+                    <input type="checkbox" id="weatherEnabled" name="weather_enabled" class="w-4 h-4">
+                    <span class="text-sm text-gray-600">开启天气显示</span>
+                  </div>
+  
+                  <div class="mb-2">
+                    <label for="weatherCity1" class="text-xs text-gray-500 block mb-1">城市 1</label>
+                    <input type="text" id="weatherCity1" name="weather_city_1" placeholder="例如：北京" class="w-full text-sm p-2 border rounded">
+                  </div>
+  
+                  <div class="mb-2">
+                    <label for="weatherCity2" class="text-xs text-gray-500 block mb-1">城市 2（可选）</label>
+                    <input type="text" id="weatherCity2" name="weather_city_2" placeholder="例如：上海" class="w-full text-sm p-2 border rounded">
+                  </div>
+  
+                  <div class="mb-2">
+                    <label class="text-xs text-gray-500 block mb-1">卡片大小</label>
+                    <div class="flex gap-3">
+                      <label class="flex items-center gap-1 text-sm cursor-pointer">
+                        <input type="radio" name="weatherCardSize" value="2x" checked> 2倍（占2个书签位）
+                      </label>
+                      <label class="flex items-center gap-1 text-sm cursor-pointer">
+                        <input type="radio" name="weatherCardSize" value="4x"> 4倍（占4个书签位）
+                      </label>
+                    </div>
+                  </div>
+  
+                  <div>
+                    <label for="weatherCardSort" class="text-xs text-gray-500 block mb-1">摆放位置（0=最前，50=中间，999=最后）</label>
+                    <input type="number" id="weatherCardSort" name="weather_card_sort" min="0" max="999" value="0" class="w-32 text-sm p-2 border rounded">
+                  </div>
+                </div>
                 <div>
                   <label for="githubUrl" class="text-xs text-gray-500 block mb-1">GitHub 仓库链接</label>
                   <input type="url" id="githubUrl" placeholder="https://github.com/username/repo" class="w-full text-sm p-2 border rounded">
