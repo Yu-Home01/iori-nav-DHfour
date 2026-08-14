@@ -320,41 +320,22 @@ export async function onRequest(context) {
     ? renderSiteCards(sites, S)
     : renderEmptyState(categories.length, S.home_hide_admin);
 
-  // 插入天气卡片到置顶/常用分类
-  if (showWeather && weatherCardHtml) {
+  // 插入天气卡片到置顶/常用分类的书签网格
+  if (showWeather && weatherCardHtml && sitesGridMarkup) {
     const sort = Number(S.weather_card_sort || 0);
   
-    if (sort >= 900) {
-      // 最后面：在 grid 容器的最后一个 </div> 前插入
-      const lastIndex = sitesGridMarkup.lastIndexOf('</div>');
-      if (lastIndex > 0) {
-        sitesGridMarkup = sitesGridMarkup.slice(0, lastIndex) + weatherCardHtml + sitesGridMarkup.slice(lastIndex);
-      }
-    } else if (sort >= 400) {
-      // 中间：在第一个书签卡片后面插入
-      const firstCardMatch = sitesGridMarkup.match(/<div[^>]*class="[^"]*site-card[^"]*"/i);
-      if (firstCardMatch) {
-        let depth = 1;
-        let pos = firstCardMatch.index + firstCardMatch[0].length;
-        while (pos < sitesGridMarkup.length && depth > 0) {
-          const openIdx = sitesGridMarkup.indexOf('<div', pos);
-          const closeIdx = sitesGridMarkup.indexOf('</div>', pos);
-          if (closeIdx === -1) break;
-          if (openIdx !== -1 && openIdx < closeIdx) {
-            depth++;
-            pos = openIdx + 4;
-          } else {
-            depth--;
-            pos = closeIdx + 6;
-          }
-        }
-        sitesGridMarkup = sitesGridMarkup.slice(0, pos) + weatherCardHtml + sitesGridMarkup.slice(pos);
-      } else {
-        sitesGridMarkup = sitesGridMarkup.replace(/(<div\s+class="grid[^"]*"[^>]*>)/i, '$1' + weatherCardHtml);
+    if (sort >= 500) {
+      // 放在最后：在最后一个 </div> 之前插入
+      const lastDiv = sitesGridMarkup.lastIndexOf('</div>');
+      if (lastDiv > 0) {
+        sitesGridMarkup = sitesGridMarkup.slice(0, lastDiv) + weatherCardHtml + sitesGridMarkup.slice(lastDiv);
       }
     } else {
-      // 最前面：在 grid 开始标签后插入
-      sitesGridMarkup = sitesGridMarkup.replace(/(<div\s+class="grid[^"]*"[^>]*>)/i, '$1' + weatherCardHtml);
+      // 放在最前：在第一个标签的 ">" 之后插入
+      const firstTagEnd = sitesGridMarkup.indexOf('>');
+      if (firstTagEnd > 0) {
+        sitesGridMarkup = sitesGridMarkup.slice(0, firstTagEnd + 1) + weatherCardHtml + sitesGridMarkup.slice(firstTagEnd + 1);
+      }
     }
   }
 
