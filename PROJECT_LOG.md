@@ -24,15 +24,35 @@
 | 置顶/常用分类 | `schema.sql`, `functions/index.js`, `public/js/admin-shared.js` 等 | 2026-08-08 |
 | 置顶书签后台排序 | `functions/api/config/index.js`, `public/js/admin-shared.js` | 2026-08-08 |
 | 桌面端侧边栏抽屉式设计 | `functions/index.js`，`public/index.html`，`public/css/style.css`，`public/js/home-category-nav.js`| 2026-08-12 |
+| 自定义导航栏头像（浏览器标签页 Favicon 本地上传） |详见下面“附加内容-1”|2026-08—12——2026-08-14|
+**附加内容-1：**
+1. **新增"自定义导航栏头像（浏览器标签页 Favicon 本地上传）"功能**
+   - 后台设置页面新增"📁 上传"按钮，支持本地上传图片作为浏览器标签页图标
+   - 前端自动将图片压缩为 32×32 PNG，控制体积
+   - 采用"前端动态注入"方案（参考 CloudNav-Oorz）：页面加载完成后通过 JS 异步绘制 canvas 并设置 favicon，避免 base64 直接写入 HTML 导致浏览器卡顿/无法加载
+   - 同时兼容外部 URL 链接和本地上传两种方式
+
+2. **修正此前误加的"页面内标题上方头像"代码**
+   - 删除 `functions/lib/settings-parser.js` 中的 `nav_avatar_url` / `nav_avatar_size` 配置项
+   - 删除 `functions/index.js` 中的 `navAvatarHtml` 注入逻辑
+   - 删除 `public/admin/index.html` 中的头像上传区域 HTML
+   - 删除 `public/js/admin-settings-form.js` 中的 `navAvatar` 相关代码
+   - 恢复为仅修改浏览器标签页 favicon 的正确方案
+
+**涉及文件：**
+- `functions/lib/settings-parser.js` — 新增 `favicon_url` base64 Data URI 校验逻辑
+- `functions/index.js` — 首页 SSR 渲染时动态注入 favicon 设置脚本
+- `public/admin/index.html` — 设置模态框中 favicon 区域新增上传按钮
+- `public/js/admin-settings-form.js` — 新增图片选择、压缩、Base64 转换、预览、清除逻辑
+
 
 ## ❌ 已知问题 / 待修复
 - [ ] 问题1：描述问题...
 - [ ] 问题2：描述问题...
 
 ## 📋 待添加功能
-- [自定义导航栏头像] 功能2：可以本地上传图片作为导航栏头像。
-- [添加天气组件] 功能3：为导航页添加天气组件， 可以显示两个地方的天气，可以自定义组件摆放位置。
-- [添加必应搜索] 功能3：将必应（Bing）搜索添加到“站外”搜索选项中。
+- [添加天气组件] 功能：为导航页添加天气组件、可以显示两个地方的天气、可以自定义组件摆放位置、可以自定义组件开启与关闭。
+- [添加必应搜索] 功能：将必应（Bing）搜索添加到“站外”搜索选项中。
 
 ## 🗂️ 关键文件清单
 | 文件路径 | 作用 |
@@ -52,9 +72,10 @@
 | `admin-bookmark-list.js` | v=2 | ... |
 | `style.css` | v=f437bf08 | 2026-08-12 |
 | `home-category-nav.js` | v=f3808ac4 | 2026-08-12 |
+| `admin-settings-form.js` | v=4 | 2026-08-13 |
 
 ## 💡 给 Kimi 的续上下文模板
 > 我是 Yu-Home01，Fork 了 iori-nav 项目，在 test 分支开发。
-> 当前已完成：Favicon、GitHub链接、置顶/常用分类及排序、桌面端侧边栏抽屉式设计。
-> 现在要做：【自定义导航栏头像】。
+> 当前已完成：Favicon、GitHub链接、置顶/常用分类及排序、桌面端侧边栏抽屉式设计、自定义导航栏头像（浏览器标签页 Favicon 本地上传）。
+> 现在要做：【添加天气组件】该功能主要有以下要求：可以显示两个地方的天气、可以自定义组件摆放位置、可以自定义组件开启与关闭。
 > 技术栈：Cloudflare Pages + Workers + D1 + KV。
