@@ -437,15 +437,31 @@ export async function onRequest(context) {
   // 自定义 Favicon
   if (S.favicon_url) {
     let safeFaviconUrl = S.favicon_url;
-    if (!/^data:image\/[\w+.-]+;base64,/i.test(safeFaviconUrl)) {
+  
+    if (/^data:image\/[\w+.-]+;base64,/i.test(safeFaviconUrl)) {
+      // base64 方式：前端动态注入，避免浏览器直接解析超长 data URI 导致卡顿
+      headInjections += `<script>
+        (function(){
+          var d='${escapeHTML(safeFaviconUrl)}';
+          var i=new Image();
+          i.onload=function(){
+            var c=document.createElement('canvas');
+            c.width=32;c.height=32;
+            var x=c.getContext('2d');
+            x.drawImage(i,0,0,32,32);
+            var l=document.querySelector('link[rel="icon"]');
+            if(!l){l=document.createElement('link');l.rel='icon';document.head.appendChild(l);}
+            l.href=c.toDataURL('image/png');
+          };
+          i.src=d;
+        })();
+      </script>`;
+    } else {
+      // 普通 URL
       safeFaviconUrl = sanitizeUrl(safeFaviconUrl);
-    }
-    if (safeFaviconUrl) {
-      let iconType = 'image/png';
-      if (safeFaviconUrl.startsWith('data:image/png')) iconType = 'image/png';
-      else if (safeFaviconUrl.startsWith('data:image/jpeg')) iconType = 'image/jpeg';
-      else if (safeFaviconUrl.startsWith('data:image/webp')) iconType = 'image/webp';
-      headInjections += `<link rel="icon" href="${escapeHTML(safeFaviconUrl)}" type="${iconType}">`;
+      if (safeFaviconUrl) {
+        headInjections += `<link rel="icon" href="${escapeHTML(safeFaviconUrl)}" type="image/x-icon">`;
+      }
     }
   }
   
