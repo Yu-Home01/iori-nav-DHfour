@@ -65,6 +65,11 @@
       faviconUrlInput: document.getElementById('faviconUrl'),
       faviconUploadInput: document.getElementById('faviconUploadInput'),
       faviconUploadBtn: document.getElementById('faviconUploadBtn'),
+      weatherEnabledSwitch: document.getElementById('weatherEnabled'),
+      weatherCity1Input: document.getElementById('weatherCity1'),
+      weatherCity2Input: document.getElementById('weatherCity2'),
+      weatherCardSizeRadios: document.getElementsByName('weatherCardSize'),
+      weatherCardSortInput: document.getElementById('weatherCardSort'),
       githubUrlInput: document.getElementById('githubUrl'),
       homeDefaultCategorySelect: document.getElementById('homeDefaultCategory'),
       homeRememberLastCategorySwitch: document.getElementById('homeRememberLastCategorySwitch'),
@@ -237,6 +242,18 @@
     currentSettings.home_footer_text = refs.homeFooterTextInput?.value.trim() || '';
     currentSettings.favicon_url = refs.faviconUrlInput?.value.trim() || '';
     currentSettings.github_url = refs.githubUrlInput?.value.trim() || '';
+    currentSettings.weather_enabled = !!refs.weatherEnabledSwitch?.checked;
+    currentSettings.weather_city_1 = refs.weatherCity1Input?.value.trim() || '';
+    currentSettings.weather_city_2 = refs.weatherCity2Input?.value.trim() || '';
+
+    for (const radio of refs.weatherCardSizeRadios || []) {
+      if (radio.checked) {
+        currentSettings.weather_card_size = radio.value;
+        break;
+      }
+    }
+
+    currentSettings.weather_card_sort = refs.weatherCardSortInput?.value || '0';
     currentSettings.home_default_category = refs.homeDefaultCategorySelect?.value || '';
     currentSettings.home_remember_last_category = !!refs.homeRememberLastCategorySwitch?.checked;
     currentSettings.home_search_engine_enabled = !!refs.searchEngineSwitch?.checked;
@@ -388,6 +405,11 @@
     setValue(refs.homeFooterTextInput, currentSettings.home_footer_text || '');
     setValue(refs.faviconUrlInput, currentSettings.favicon_url || '');
     setValue(refs.githubUrlInput, currentSettings.github_url || '');
+    setChecked(refs.weatherEnabledSwitch, currentSettings.weather_enabled);
+    setValue(refs.weatherCity1Input, currentSettings.weather_city_1 || '');
+    setValue(refs.weatherCity2Input, currentSettings.weather_city_2 || '');
+    setRadioValue(refs.weatherCardSizeRadios, currentSettings.weather_card_size || '2x');
+    setValue(refs.weatherCardSortInput, currentSettings.weather_card_sort || '0');
     setValue(refs.homeDefaultCategorySelect, currentSettings.home_default_category || '');
     setChecked(refs.homeRememberLastCategorySwitch, currentSettings.home_remember_last_category);
     setChecked(refs.searchEngineSwitch, currentSettings.home_search_engine_enabled);
