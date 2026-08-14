@@ -124,17 +124,6 @@ export async function onRequestPost(context) {
       // Continue, maybe it exists or error will happen on upsert
     }
 
-    // 如果 favicon_url 是 base64 图片，存入 KV，替换为固定 API URL
-    if (settings.favicon_url && /^data:image\/[\w+.-]+;base64,/i.test(settings.favicon_url)) {
-      try {
-        await env.NAV_AUTH.put('favicon_image', settings.favicon_url);
-        settings.favicon_url = '/api/favicon';
-      } catch (e) {
-        console.error('Failed to save favicon to KV:', e);
-        return errorResponse('图标保存失败，请重试', 500);
-      }
-    }
-    
     const normalizedEntries = [];
     for (const [key, value] of Object.entries(settings)) {
       // 不要保存临时字段
