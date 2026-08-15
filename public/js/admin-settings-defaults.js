@@ -18,6 +18,7 @@
     'mobile_layout_hide_links',
     'mobile_layout_hide_category',
     'mobile_layout_enable_frosted_glass',
+    'weather_enabled',
   ];
 
   const TRUTHY_STRING_FIELDS = [
@@ -71,6 +72,10 @@
     'mobile_card_desc_font',
     'mobile_card_desc_size',
     'mobile_card_desc_color',
+    'weather_city_1',
+    'weather_city_2',
+    'weather_card_size',
+    'weather_card_sort',
   ];
 
   const MOBILE_FALLBACK_FIELDS = [
@@ -156,6 +161,11 @@
       mobile_card_desc_font: '',
       mobile_card_desc_size: '11',
       mobile_card_desc_color: '',
+      weather_enabled: false,
+      weather_city_1: '',
+      weather_city_2: '',
+      weather_card_size: '2x',
+      weather_card_sort: '0',
     };
   }
 
