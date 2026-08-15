@@ -1,4 +1,4 @@
-const CACHE_TTL = 1800;
+const CACHE_TTL = 1800; // 30分钟缓存
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -23,10 +23,10 @@ export async function onRequestGet(context) {
       });
     }
 
-    // 2. 请求 uapis.cn（注意：参数是 name=，不是 city=）
-    const apiUrl = `https://uapis.cn/api/weather?name=${encodeURIComponent(city)}`;
+    // 2. 请求 wttr.in 天气接口（免费，无需密钥）
+    const apiUrl = `https://wttr.in/${encodeURIComponent(city)}?format=j1&lang=zh`;
     const response = await fetch(apiUrl, {
-      headers: { 'User-Agent': 'iori-nav/1.0' },
+      headers: { 'User-Agent': 'Mozilla/5.0' },
     });
 
     if (!response.ok) {
@@ -36,29 +36,19 @@ export async function onRequestGet(context) {
       });
     }
 
-    // 3. 获取原始数据
-    const rawText = await response.text();
-    let rawData;
-    try {
-      rawData = JSON.parse(rawText);
-    } catch (e) {
-      return new Response(JSON.stringify({ code: 502, message: 'Invalid JSON from weather API' }), {
-        status: 502,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    // 3. 解析数据
+    const rawData = await response.json();
+    const current = rawData.current_condition?.[0] || {};
 
     // 4. 转换为前端格式
     const formatted = {
       code: 200,
       data: {
-        city: (rawData.province && rawData.city) 
-          ? `${rawData.province} ${rawData.city}` 
-          : (rawData.city || city),
-        temp: rawData.temperature !== undefined ? `${rawData.temperature}°C` : '--',
-        weather: rawData.weather || '--',
-        wind: rawData.wind_direction ? `${rawData.wind_direction} ` : '',
-        windLevel: rawData.wind_power || ''
+        city: city,
+        temp: current.temp_C ? `${current.temp_C}°C` : '--',
+        weather: current.lang_zh?.[0]?.value || current.weatherDesc?.[0]?.value || '--',
+        wind: current.winddir16Point ? `${current.winddir16Point} ` : '',
+        windLevel: current.windspeedKmph ? `${current.windspeedKmph}km/h` : ''
       }
     };
 
