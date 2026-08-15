@@ -15,6 +15,7 @@ export async function onRequestGet(context) {
   const cacheKey = `weather:${city}`;
 
   try {
+    // 1. 先读缓存
     const cached = await env.NAV_AUTH.get(cacheKey);
     if (cached) {
       return new Response(cached, {
@@ -22,6 +23,7 @@ export async function onRequestGet(context) {
       });
     }
 
+    // 2. 请求 uapis.cn 天气接口
     const apiUrl = `https://uapis.cn/api/weather?city=${encodeURIComponent(city)}`;
     const response = await fetch(apiUrl, {
       headers: { 'User-Agent': 'iori-nav/1.0' },
@@ -34,12 +36,33 @@ export async function onRequestGet(context) {
       });
     }
 
-    const data = await response.text();
-    await env.NAV_AUTH.put(cacheKey, data, { expirationTtl: CACHE_TTL });
+    // 3. 解析原始数据
+    const rawData = await response.json();
 
-    return new Response(data, {
+    // 4. 转换为前端期望的格式
+    const formatted = {
+      code: 200,
+      data: {
+        city: rawData.province && rawData.city 
+          ? `${rawData.province} ${rawData.city}` 
+          : (rawData.city || city),
+        temp: rawData.temperature ? `${rawData.temperature}°C` : '--',
+        weather: rawData.weather || '--',
+        wind: rawData.wind_direction ? `${rawData.wind_direction} ` : '',
+        windLevel: rawData.wind_power || ''
+      }
+    };
+
+    const resultJson = JSON.stringify(formatted);
+
+    // 5. 写入缓存
+    await env.NAV_AUTH.put(cacheKey, resultJson, { expirationTtl: CACHE_TTL });
+
+    // 6. 返回
+    return new Response(resultJson, {
       headers: { 'Content-Type': 'application/json' },
     });
+
   } catch (e) {
     console.error('Weather error:', e);
     return new Response(JSON.stringify({ code: 500, message: 'Internal error' }), {
