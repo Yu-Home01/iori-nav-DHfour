@@ -324,77 +324,88 @@
   // 天气卡片渲染函数
   function renderWeatherCard() {
     // 先移除已有的天气卡片（避免重复）
-    const existing = document.querySelector('.weather-card');
-    if (existing) existing.remove();
-    
+    document.querySelectorAll('.weather-card').forEach(el => el.remove());
+  
     const currentCatalog = window.IoriHome?.currentCatalog || 'all';
     const weatherConfig = window.IORI_WEATHER_CONFIG;
-    
+  
     // 只有"置顶/常用"分类才显示，且要开启了天气
     if (currentCatalog !== 'pinned' || !weatherConfig?.enabled || !weatherConfig.cities?.length) {
       return;
     }
-    
-    const sizeClass = weatherConfig.size === '4x' ? 'col-span-2 md:col-span-4' : 'col-span-2';
-    
-    const weatherCard = document.createElement('div');
-    weatherCard.className = `${cardConfig.baseCardClass} ${cardConfig.frostedClass} ${cardConfig.cardStyleClass} weather-card ${sizeClass}`;
-    weatherCard.style.cssText = 'background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(147,197,253,0.08) 100%); border: 1px solid rgba(59,130,246,0.15); min-height: 140px; height: 100%;';
-    weatherCard.innerHTML = `
-      <div style="padding: 16px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-        <div class="weather-loading" style="text-align: center; color: #888; font-size: 14px;">🌤️ 天气加载中...</div>
-        <div class="weather-cities" style="display: none; flex-wrap: wrap; gap: 24px; justify-content: center; align-items: center;"></div>
-      </div>
-    `;
-    
-    const sort = weatherConfig.sort || 0;
+  
     const sitesGrid = document.getElementById('sitesGrid');
     if (!sitesGrid) return;
+  
+    const sort = weatherConfig.sort || 0;
+    const sizeClass = weatherConfig.size === '4x' ? 'col-span-2 md:col-span-4' : 'col-span-2';
+  
+    // 为每个城市创建一张独立的天气卡片
+    const weatherCards = [];
+  
+    weatherConfig.cities.forEach((city) => {
+      const weatherCard = document.createElement('div');
+      weatherCard.className = `${cardConfig.baseCardClass} ${cardConfig.frostedClass} ${cardConfig.cardStyleClass} weather-card ${sizeClass}`;
     
+      weatherCard.innerHTML = `
+        <div class="weather-loading flex items-center justify-center h-full min-h-[100px]">
+          <span class="text-gray-400 dark:text-gray-500 text-sm">🌤️ 加载中...</span>
+        </div>
+      `;
+    
+      weatherCards.push({ card: weatherCard, city });
+    });
+  
+    // 插入到 grid 中
     if (sort >= 500) {
-      sitesGrid.appendChild(weatherCard);
+      // 放在最后
+      weatherCards.forEach(({ card }) => sitesGrid.appendChild(card));
     } else {
-      sitesGrid.insertBefore(weatherCard, sitesGrid.firstChild);
+      // 放在最前面（保持城市顺序）
+      for (let i = weatherCards.length - 1; i >= 0; i--) {
+        sitesGrid.insertBefore(weatherCards[i].card, sitesGrid.firstChild);
+      }
     }
-    
-    // 异步获取天气数据
-    Promise.all(weatherConfig.cities.map(city => 
+  
+    // 异步获取每个城市的天气
+    weatherCards.forEach(({ card, city }) => {
       fetch('/api/weather?city=' + encodeURIComponent(city))
         .then(r => r.json())
-        .then(d => d.code === 200 ? d.data : null)
-        .catch(() => null)
-    )).then(results => {
-      const container = weatherCard.querySelector('.weather-cities');
-      const loading = weatherCard.querySelector('.weather-loading');
-      if (!container || !loading) return;
-      
-      let html = '';
-      results.forEach(data => {
-        if (data) {
-          html += '<div style="display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 16px; background: rgba(255,255,255,0.5); border-radius: 12px;">' +
-            '<span style="font-weight: 600; font-size: 12px; color: #374151;">' + data.city + '</span>' +
-            '<span style="font-size: 26px; font-weight: 700; color: #4a7c3c;">' + data.temp + '</span>' +
-            '<span style="font-size: 13px; color: #666;">' + data.weather + '</span>' +
-            '<span style="font-size: 11px; color: #888;">' + data.wind + data.windLevel + '</span>' +
-          '</div>';
-        }
-      });
-      
-      if (html) {
-        container.innerHTML = html;
-        container.style.display = 'flex';
-        loading.style.display = 'none';
-      }
+        .then(d => {
+          if (d.code === 200 && d.data) {
+            const data = d.data;
+            card.innerHTML = `
+              <div class="flex flex-col items-center justify-center h-full gap-1 p-3">
+                <span class="text-xs text-gray-500 dark:text-gray-400 font-medium truncate w-full text-center">${data.city}</span>
+                <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">${data.temp}</span>
+                <span class="text-xs text-gray-500 dark:text-gray-400 truncate w-full text-center">${data.weather}</span>
+                <span class="text-xs text-gray-400 dark:text-gray-500 truncate w-full text-center">${data.wind}${data.windLevel}</span>
+              </div>
+            `;
+          } else {
+            card.innerHTML = `
+              <div class="flex items-center justify-center h-full min-h-[100px]">
+                <span class="text-gray-400 dark:text-gray-500 text-sm">获取失败</span>
+              </div>
+            `;
+          }
+        })
+        .catch(() => {
+          card.innerHTML = `
+            <div class="flex items-center justify-center h-full min-h-[100px]">
+              <span class="text-gray-400 dark:text-gray-500 text-sm">获取失败</span>
+            </div>
+          `;
+        });
     });
   }
 
   // 挂载到全局，供分类导航调用
   window.IoriHome.renderWeatherCard = renderWeatherCard;
-  
+
   // 页面加载时先渲染一次
   renderWeatherCard();
   // ========== 天气卡片渲染结束 ==========
-    }
 
     return {
       init,
