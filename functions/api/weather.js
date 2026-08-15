@@ -23,8 +23,8 @@ export async function onRequestGet(context) {
       });
     }
 
-    // 2. 请求 uapis.cn
-    const apiUrl = `https://uapis.cn/api/weather?city=${encodeURIComponent(city)}`;
+    // 2. 请求 uapis.cn（注意：参数是 name=，不是 city=）
+    const apiUrl = `https://uapis.cn/api/weather?name=${encodeURIComponent(city)}`;
     const response = await fetch(apiUrl, {
       headers: { 'User-Agent': 'iori-nav/1.0' },
     });
@@ -36,7 +36,7 @@ export async function onRequestGet(context) {
       });
     }
 
-    // 3. 获取原始数据（先用 text 再用 JSON.parse，更安全）
+    // 3. 获取原始数据
     const rawText = await response.text();
     let rawData;
     try {
@@ -55,7 +55,7 @@ export async function onRequestGet(context) {
         city: (rawData.province && rawData.city) 
           ? `${rawData.province} ${rawData.city}` 
           : (rawData.city || city),
-        temp: rawData.temperature ? `${rawData.temperature}°C` : '--',
+        temp: rawData.temperature !== undefined ? `${rawData.temperature}°C` : '--',
         weather: rawData.weather || '--',
         wind: rawData.wind_direction ? `${rawData.wind_direction} ` : '',
         windLevel: rawData.wind_power || ''
