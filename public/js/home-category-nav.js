@@ -221,6 +221,15 @@
         const filteredSites = cardController.getSitesForCatalog(catalogId);
         cardController.setActiveCatalogId(catalogId);
         cardController.renderSites(filteredSites);
+        
+        // 更新当前分类并重新渲染天气卡片
+        if (window.IoriHome) {
+          window.IoriHome.currentCatalog = catalogId || 'all';
+          if (window.IoriHome.renderWeatherCard) {
+            window.IoriHome.renderWeatherCard();
+          }
+        }
+        
         Home.updateHeading?.(null, catalogId ? catalogName : null, filteredSites.length);
         updateNavigationState(catalogId);
 
@@ -370,6 +379,15 @@
 
         cardController.setActiveCatalogId(lastId);
         cardController.renderSites(filteredSites);
+        
+        // 恢复上次分类后更新天气卡片
+        if (window.IoriHome) {
+          window.IoriHome.currentCatalog = lastId || 'all';
+          if (window.IoriHome.renderWeatherCard) {
+            window.IoriHome.renderWeatherCard();
+          }
+        }
+        
         Home.updateHeading?.(null, catalogName, filteredSites.length);
         updateNavigationState(lastId);
       } else {
