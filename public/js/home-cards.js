@@ -339,7 +339,7 @@
     
     const weatherCard = document.createElement('div');
     weatherCard.className = `${cardConfig.baseCardClass} ${cardConfig.frostedClass} ${cardConfig.cardStyleClass} weather-card ${sizeClass}`;
-    weatherCard.style.cssText = 'background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(147,197,253,0.08) 100%); border: 1px solid rgba(59,130,246,0.15); min-height: 120px;';
+    weatherCard.style.cssText = 'background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(147,197,253,0.08) 100%); border: 1px solid rgba(59,130,246,0.15); min-height: 140px; height: 100%;';
     weatherCard.innerHTML = `
       <div style="padding: 16px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;">
         <div class="weather-loading" style="text-align: center; color: #888; font-size: 14px;">🌤️ 天气加载中...</div>
