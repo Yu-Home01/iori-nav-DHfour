@@ -1,4 +1,4 @@
-const CACHE_TTL = 1800; // 30分钟缓存
+const CACHE_TTL = 1800;
 
 export async function onRequestGet(context) {
   const { request, env } = context;
@@ -15,7 +15,7 @@ export async function onRequestGet(context) {
   const cacheKey = `weather:${city}`;
 
   try {
-    // 1. 先读缓存
+    // 1. 读缓存
     const cached = await env.NAV_AUTH.get(cacheKey);
     if (cached) {
       return new Response(cached, {
@@ -23,27 +23,36 @@ export async function onRequestGet(context) {
       });
     }
 
-    // 2. 请求 uapis.cn 天气接口
+    // 2. 请求 uapis.cn
     const apiUrl = `https://uapis.cn/api/weather?city=${encodeURIComponent(city)}`;
     const response = await fetch(apiUrl, {
       headers: { 'User-Agent': 'iori-nav/1.0' },
     });
 
     if (!response.ok) {
-      return new Response(JSON.stringify({ code: 502, message: 'Weather API error' }), {
+      return new Response(JSON.stringify({ code: 502, message: 'Weather API error: ' + response.status }), {
         status: 502,
         headers: { 'Content-Type': 'application/json' },
       });
     }
 
-    // 3. 解析原始数据
-    const rawData = await response.json();
+    // 3. 获取原始数据（先用 text 再用 JSON.parse，更安全）
+    const rawText = await response.text();
+    let rawData;
+    try {
+      rawData = JSON.parse(rawText);
+    } catch (e) {
+      return new Response(JSON.stringify({ code: 502, message: 'Invalid JSON from weather API' }), {
+        status: 502,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
 
-    // 4. 转换为前端期望的格式
+    // 4. 转换为前端格式
     const formatted = {
       code: 200,
       data: {
-        city: rawData.province && rawData.city 
+        city: (rawData.province && rawData.city) 
           ? `${rawData.province} ${rawData.city}` 
           : (rawData.city || city),
         temp: rawData.temperature ? `${rawData.temperature}°C` : '--',
@@ -65,7 +74,7 @@ export async function onRequestGet(context) {
 
   } catch (e) {
     console.error('Weather error:', e);
-    return new Response(JSON.stringify({ code: 500, message: 'Internal error' }), {
+    return new Response(JSON.stringify({ code: 500, message: e.message || 'Internal error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
