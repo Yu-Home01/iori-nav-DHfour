@@ -24,7 +24,8 @@
 | 置顶/常用分类 | `schema.sql`, `functions/index.js`, `public/js/admin-shared.js` 等 | 2026-08-08 |
 | 置顶书签后台排序 | `functions/api/config/index.js`, `public/js/admin-shared.js` | 2026-08-08 |
 | 桌面端侧边栏抽屉式设计 | `functions/index.js`，`public/index.html`，`public/css/style.css`，`public/js/home-category-nav.js`| 2026-08-12 |
-| 自定义导航栏头像（浏览器标签页 Favicon 本地上传） |详见下面“附加内容-1”|2026-08—12——2026-08-14|
+| 自定义导航栏头像（浏览器标签页 Favicon 本地上传） |详见下面“附加内容-1”|2026-08-12—2026-08-14|
+| 添加天气组件 | 项目开发过程及设计的文件详见单独保存的“天气组件项目日志” | 2026-08-16 |【备注：此功能未达到预期效果，项目封存，暂停开发。】
   **附加内容-1：**
   1. **新增"自定义导航栏头像（浏览器标签页 Favicon 本地上传）"功能**
      - 后台设置页面新增"📁 上传"按钮，支持本地上传图片作为浏览器标签页图标
@@ -44,7 +45,7 @@
   - `functions/index.js` — 首页 SSR 渲染时动态注入 favicon 设置脚本
   - `public/admin/index.html` — 设置模态框中 favicon 区域新增上传按钮
   - `public/js/admin-settings-form.js` — 新增图片选择、压缩、Base64 转换、预览、清除逻辑
-| 添加天气组件 | 项目开发过程及设计的文件详见单独保存的“天气组件项目日志” | 2026-08-16 |【备注：此功能未达到预期效果，项目封存，暂停开发。】
+
 
 ## ❌ 已知问题 / 待修复
 - [ ] 问题：描述问题...
