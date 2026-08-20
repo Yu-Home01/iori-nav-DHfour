@@ -193,11 +193,13 @@ export async function onRequest(context) {
   }
 
   // === 6. 确定目标分类 ===
-  const requestedCatalogValue = (url.searchParams.get('catalog') || '').trim();
+  // 如果"记住分类"关闭，忽略 URL 中的 catalog 参数，始终使用默认分类
+  const rememberLastCategory = S.home_remember_last_category;
+  const requestedCatalogValue = rememberLastCategory 
+    ? (url.searchParams.get('catalog') || '').trim() 
+    : '';
   let requestedCatalogId = resolveCatalogId(requestedCatalogValue);
 
-  // 共享首页缓存仅基于稳定的默认分类渲染，避免用户的 iori_last_category
-  // 影响公共 KV HTML。记住上次分类的恢复逻辑仅在前端执行。
   if (!requestedCatalogValue) {
     const defaultCat = (S.home_default_category || '').trim();
     if (defaultCat && defaultCat !== '默认(全部)') {
