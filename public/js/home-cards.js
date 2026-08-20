@@ -324,5 +324,4 @@
         activeRenderedCatalogId = catalogId ? String(catalogId) : null;
       },
     };
-  };
 })();
