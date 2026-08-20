@@ -315,6 +315,7 @@
       if (getCardDevice() === 'mobile') {
         syncCardConfigForViewport({ force: true });
       }
+    }
 
     return {
       init,
@@ -324,4 +325,5 @@
         activeRenderedCatalogId = catalogId ? String(catalogId) : null;
       },
     };
+  };
 })();
