@@ -52,7 +52,7 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const isHomePage = url.pathname === '/' && !url.search;
   const cacheScope = isAuthenticated ? 'private' : 'public';
-  const homeCacheKey = getHomeCacheKey(cacheScope);
+  const homeCacheKey = getHomeCacheKey(cacheScope) + ':v2';
   const cookies = request.headers.get('Cookie') || '';
   const hasLegacyStaleCookie = cookies.includes('iori_cache_stale=1');
   const hasPublicStaleCookie = hasLegacyStaleCookie || cookies.includes('iori_cache_public_stale=1');
