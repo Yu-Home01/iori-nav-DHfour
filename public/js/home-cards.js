@@ -55,7 +55,7 @@
     function getSitesForCatalog(catalogId) {
       const allSites = window.IORI_SITES || [];
       if (!catalogId) return allSites;
-      if (catalogId === 'pinned') {
+      if (catalogId === 'pinned' || catalogId === '__pinned__') {
         return allSites.filter(site => site.is_pinned == 1);
       }
       return allSites.filter(site => String(site.catelog_id) === String(catalogId));
