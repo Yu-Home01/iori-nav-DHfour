@@ -262,7 +262,7 @@
       const allLinks = document.querySelectorAll('a.nav-btn, a.dropdown-item');
       allLinks.forEach(link => {
         const linkId = link.getAttribute('data-id');
-        const isActive = (!catalogId && !linkId) || (String(linkId) === String(catalogId));
+        const isActive = (!catalogId && !linkId) || (String(linkId) === String(catalogId)) || (catalogId === '__pinned__' && linkId === 'pinned');
 
         if (isActive) {
           link.classList.remove('inactive');
@@ -317,7 +317,7 @@
         links.forEach(link => {
           const svg = link.querySelector('svg');
           const linkId = link.getAttribute('data-id');
-          const isActive = (!catalogId && !linkId) || (String(linkId) === String(catalogId));
+          const isActive = (!catalogId && !linkId) || (String(linkId) === String(catalogId)) || (catalogId === '__pinned__' && linkId === 'pinned');
 
           if (isActive) {
             link.classList.remove('hover:bg-gray-100', 'text-gray-700', 'dark:hover:bg-gray-800', 'dark:text-gray-300');
