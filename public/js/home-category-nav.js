@@ -399,17 +399,27 @@
     restoreLastCategory();
     
     Home.closeSidebarMenu = function() {
-      const toggle = document.getElementById('sidebar-toggle');
-      if (toggle) toggle.checked = false;
-  
-      const mobileSidebar = document.getElementById('mobileSidebar');
-      const mobileOverlay = document.getElementById('mobileOverlay');
-      if (mobileSidebar) {
-        mobileSidebar.classList.remove('open');
+      // 1. 尝试关闭 checkbox toggle（兼容两种ID写法）
+      const toggle = document.getElementById('sidebar-toggle') || document.getElementById('sidebarToggle');
+      if (toggle && toggle.type === 'checkbox') toggle.checked = false;
+
+      // 2. 关闭侧边栏（兼容多种可能的ID和类名）
+      const sidebar = document.getElementById('mobileSidebar') 
+        || document.getElementById('sidebar') 
+        || document.querySelector('.sidebar');
+      if (sidebar) {
+        sidebar.classList.remove('open', 'translate-x-0');
+        sidebar.classList.add('-translate-x-full');
       }
-      if (mobileOverlay) {
-        mobileOverlay.classList.remove('open');
-      }
+
+      // 3. 关闭遮罩层
+      const overlay = document.getElementById('mobileOverlay') 
+        || document.getElementById('sidebar-overlay') 
+        || document.querySelector('.overlay');
+      if (overlay) overlay.classList.remove('open');
+
+      // 4. 移除 body 上的菜单状态
+      document.body.classList.remove('menu-open', 'sidebar-open');
     };
   };
 })();
