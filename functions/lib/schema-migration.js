@@ -20,7 +20,8 @@ async function runIncrementalMigrations(env) {
     env.NAV_DB.prepare('CREATE INDEX IF NOT EXISTS idx_sites_sort_order ON sites(sort_order)'),
     env.NAV_DB.prepare('CREATE INDEX IF NOT EXISTS idx_sites_private_sort ON sites(is_private, sort_order)'),
     env.NAV_DB.prepare('CREATE INDEX IF NOT EXISTS idx_sites_catelog_name ON sites(catelog_name)'),
-    env.NAV_DB.prepare('CREATE INDEX IF NOT EXISTS idx_sites_url ON sites(url)')
+    env.NAV_DB.prepare('CREATE INDEX IF NOT EXISTS idx_sites_url ON sites(url)'),
+    env.NAV_DB.prepare('CREATE INDEX IF NOT EXISTS idx_sites_pinned ON sites(is_pinned, pin_order)')
   ]);
 
   const [sitesColumns, categoryColumns, pendingColumns] = await Promise.all([
@@ -50,6 +51,18 @@ async function runIncrementalMigrations(env) {
   }
   if (!categoryCols.has('parent_id')) {
     alterStatements.push(env.NAV_DB.prepare('ALTER TABLE category ADD COLUMN parent_id INTEGER DEFAULT 0'));
+  }
+  if (!sitesCols.has('is_pinned')) {
+    alterStatements.push(env.NAV_DB.prepare('ALTER TABLE sites ADD COLUMN is_pinned INTEGER DEFAULT 0'));
+  }
+  if (!sitesCols.has('pin_order')) {
+    alterStatements.push(env.NAV_DB.prepare('ALTER TABLE sites ADD COLUMN pin_order INTEGER DEFAULT 0'));
+  }
+  if (!pendingCols.has('is_pinned')) {
+    alterStatements.push(env.NAV_DB.prepare('ALTER TABLE pending_sites ADD COLUMN is_pinned INTEGER DEFAULT 0'));
+  }
+  if (!pendingCols.has('pin_order')) {
+    alterStatements.push(env.NAV_DB.prepare('ALTER TABLE pending_sites ADD COLUMN pin_order INTEGER DEFAULT 0'));
   }
 
   for (const statement of alterStatements) {
